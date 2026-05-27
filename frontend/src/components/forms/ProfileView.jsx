@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CalendarPlus2, FileBadge, MapPinned, Settings, ShieldCheck, UserRound } from 'lucide-react';
+import { CalendarPlus2, FileBadge, KeyRound, Settings, ShieldCheck, Trash2, UserRound } from 'lucide-react';
 
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -23,8 +23,9 @@ const ProfileView = ({
     city: currentUser.city || '',
     phone_number: currentUser.phoneNumber || '',
     bio: currentUser.bio || '',
-    verification_document_type: currentUser.verificationDocumentType || 'aadhar',
+    verification_document_type: currentUser.verificationDocumentType || 'Aadhaar',
     verification_document_id: currentUser.verificationDocumentId || '',
+    date_of_birth: currentUser.dateOfBirth || '',
   });
   const [calendarForm, setCalendarForm] = useState({
     title: '',
@@ -46,6 +47,7 @@ const ProfileView = ({
       bio: formData.bio,
       verification_document_type: formData.verification_document_type,
       verification_document_id: formData.verification_document_id,
+      date_of_birth: formData.date_of_birth,
     });
   };
 
@@ -134,9 +136,41 @@ const ProfileView = ({
               </div>
               
               <div className="grid gap-4 md:grid-cols-2">
-                <Input label="Verification Type" value={formData.verification_document_type} onChange={(event) => setFormData({ ...formData, verification_document_type: event.target.value })} />
-                <Input label="Verification ID" value={formData.verification_document_id} onChange={(event) => setFormData({ ...formData, verification_document_id: event.target.value })} />
+                <Input 
+                  label="Date of Birth" 
+                  type="date" 
+                  value={formData.date_of_birth} 
+                  onChange={(event) => setFormData({ ...formData, date_of_birth: event.target.value })} 
+                />
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Verification Type</label>
+                  <select
+                    className="mt-2 w-full rounded-[1.4rem] border border-slate-200 bg-white p-4 text-slate-900 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                    value={formData.verification_document_type}
+                    onChange={(event) => setFormData({ ...formData, verification_document_type: event.target.value, verification_document_id: '' })}
+                  >
+                    <option value="Aadhaar">Aadhaar (12 digits)</option>
+                    <option value="PAN Card">PAN Card</option>
+                    <option value="Voter ID">Voter ID</option>
+                  </select>
+                </div>
               </div>
+
+              <Input 
+                label={`${formData.verification_document_type} Number`} 
+                value={formData.verification_document_id} 
+                onChange={(event) => {
+                  let val = event.target.value;
+                  if (formData.verification_document_type === 'Aadhaar') {
+                    val = val.replace(/\D/g, '').slice(0, 12);
+                  } else if (formData.verification_document_type === 'PAN Card') {
+                    val = val.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+                  } else if (formData.verification_document_type === 'Voter ID') {
+                    val = val.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+                  }
+                  setFormData({ ...formData, verification_document_id: val });
+                }} 
+              />
             </div>
           </section>
 
